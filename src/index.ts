@@ -1,5 +1,6 @@
 import { Client, Events, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
+import http from 'node:http';
 
 dotenv.config();
 
@@ -30,3 +31,19 @@ client.on(Events.MessageCreate, (message) => {
 
 // Log in to Discord with your client's token
 client.login(process.env.DISCORD_TOKEN);
+
+const PORT = parseInt(process.env['PORT'] || '8000', 10);
+
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bot Operational');
+});
+
+// 2. PASS THE PORT NUMBER FIRST, THEN THE STRING IP ADRESS
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🌐 Health check web layer successfully tracking on port ${PORT}`);
+});
+
+server.on('error', (err) => {
+    console.error('Network interface observation issue:', err.message);
+});
