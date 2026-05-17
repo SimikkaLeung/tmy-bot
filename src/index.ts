@@ -1,6 +1,7 @@
-import { Client, Events, GatewayIntentBits } from 'discord.js';
+import { Client, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
 import * as dotenv from 'dotenv';
 import http from 'node:http';
+import * as pingCommand from './commands/ping.js';
 
 dotenv.config();
 
@@ -36,14 +37,59 @@ const PORT = parseInt(process.env['PORT'] || '8000', 10);
 
 const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bot Operational');
+    res.end('OK');
 });
 
 // 2. PASS THE PORT NUMBER FIRST, THEN THE STRING IP ADRESS
-server.listen(PORT, '0.0.0.0', () => {
-    console.log(`🌐 Health check web layer successfully tracking on port ${PORT}`);
+server.listen(PORT, '0.0.0.0', async () => {
+    console.log(`🌐 Health check server listening on port ${PORT}`);
+
+    try {
+        console.log('Connecting to Discord Gateway...');
+        await client.login(process.env['DISCORD_TOKEN']);
+    } catch (error) {
+        console.error('Failed to log in to Discord:', error);
+    }
 });
 
-server.on('error', (err) => {
-    console.error('Network interface observation issue:', err.message);
+client.once(Events.ClientReady, async (readyClient) => {
+    console.log(`🤖 Logged in as ${readyClient.user.tag}`);
+
+    const token = process.env['DISCORD_TOKEN'];
+    if (!token) return console.error('Missing DISCORD_TOKEN env variable.');
+
+    const rest = new REST({ version: '10' }).setToken(token);
+
+    try {
+        console.log('Started refreshing application (/) commands.');
+
+        // This publishes your /ping command directly to Discord's servers
+        await rest.put(
+            Routes.applicationCommands(readyClient.user.id),
+            { body: [pingCommand.data.toJSON()] },
+        );
+
+        console.log('Successfully reloaded application (/) commands.');
+    } catch (error) {
+        console.error('Error deploying slash commands:', error);
+    }
 });
+
+client.on(Events.InteractionCreate, async (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    if (interaction.commandName === 'ping') {
+        try {
+            await pingCommand.execute(interaction);
+        } catch (error) {
+            console.error('Error executing ping command:', error);
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({ content: 'There was an error executing this command!', ephemeral: true });
+            } else {
+                await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
+            }
+        }
+    }
+});
+
+server.on('error', (err) => console.error('Server error:', err.message));

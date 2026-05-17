@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +19,7 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^20.19.41",
+    "tsx": "^4.22.1",
     "typescript": "^5.4.0"
   }
 }
