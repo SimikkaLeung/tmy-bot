@@ -28,8 +28,8 @@ const commandsData: any[] = [];
 
 for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
-    // Dynamically import the file on the fly
-    const command = await import(`file://${filePath}`);
+    const imporrtedFile = require(filePath);
+    const command = imporrtedFile.default ? imporrtedFile.default : imporrtedFile;
     
     if ('data' in command && 'execute' in command) {
         // Save the command into our memory collection using its name as the key
