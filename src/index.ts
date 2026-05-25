@@ -96,4 +96,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
+client.on(Events.Warn, (warning) => {
+    console.warn(`⚠️ [Discord Warning] ${warning}`);
+});
+
 server.on('error', (err) => console.error('Server error:', err.message));
