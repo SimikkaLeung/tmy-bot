@@ -7,9 +7,15 @@ import { pathToFileURL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 1. Locate and read your commands directory
+// 1. Locate your commands directory
 const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
+
+// 💡 FIX: Safely filter out TypeScript declaration files (.d.ts)
+const commandFiles = fs.readdirSync(commandsPath).filter(file => {
+    const isTargetFile = file.endsWith('.js') || file.endsWith('.ts');
+    const isDeclarationFile = file.endsWith('.d.ts');
+    return isTargetFile && !isDeclarationFile;
+});
 
 const commandsJson = [];
 
@@ -17,11 +23,16 @@ const commandsJson = [];
 for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const fileUrl = pathToFileURL(filePath).href;
-    const importedFile = await import(fileUrl);
-    const command = importedFile.default ? importedFile.default : importedFile;
     
-    if (command && command.data) {
-        commandsJson.push(command.data.toJSON());
+    try {
+        const importedFile = await import(fileUrl);
+        const command = importedFile.default ? importedFile.default : importedFile;
+        
+        if (command && command.data) {
+            commandsJson.push(command.data.toJSON());
+        }
+    } catch (error) {
+        console.error(`❌ Error importing file ${file} for deployment:`, error);
     }
 }
 
