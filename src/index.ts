@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'node:fs';
 import { createServer } from 'node:http';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 dotenv.config();
 
@@ -26,18 +26,29 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 
 const commandsData: any[] = [];
 
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const imporrtedFile = require(filePath);
-    const command = imporrtedFile.default ? imporrtedFile.default : imporrtedFile;
-    
-    if ('data' in command && 'execute' in command) {
-        // Save the command into our memory collection using its name as the key
-        (client as any).commands.set(command.data.name, command);
-        commandsData.push(command.data.toJSON());
-        console.log(`Loaded command: /${command.data.name}`);
+const loadCommands = async () => {
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const fileUrl = pathToFileURL(filePath).href;
+        
+        try {
+            const importedFile = await import(fileUrl);
+            const command = importedFile.default ? importedFile.default : importedFile;
+
+            if (command && 'data' in command && 'execute' in command) {
+                (client as any).commands.set(command.data.name, command);
+                console.log(`✅ Cached memory mapping for: /${command.data.name}`);
+            } else {
+                console.log(`⚠️ Skipped file ${file} - Data or Execute properties missing.`);
+            }
+        } catch (error) {
+            console.error(`❌ Failed to load command file ${file}:`, error);
+        }
     }
-}
+};
+
+await loadCommands();
+
 
 const PORT = parseInt(process.env['PORT'] || '8000', 10);
 const server = createServer((req, res) => {
