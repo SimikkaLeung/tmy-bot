@@ -72,29 +72,29 @@ client.once(Events.ClientReady, async (readyClient) => {
     }
 });
 
-client.on(Events.InteractionCreate, async (interaction) => {
-    if (!interaction.isChatInputCommand()) return;
+// client.on(Events.InteractionCreate, async (interaction) => {
+//     if (!interaction.isChatInputCommand()) return;
 
-    // Fetch the matched command object dynamically out of our collection cache
-    const command = (client as any).commands.get(interaction.commandName);
+//     // Fetch the matched command object dynamically out of our collection cache
+//     const command = (client as any).commands.get(interaction.commandName);
 
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
+//     if (!command) {
+//         console.error(`No command matching ${interaction.commandName} was found.`);
+//         return;
+//     }
 
-    try {
-        // Run the command's specific file execution code
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error executing this command!', ephemeral: true });
-        } else {
-            await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
-        }
-    }
-});
+//     try {
+//         // Run the command's specific file execution code
+//         await command.execute(interaction);
+//     } catch (error) {
+//         console.error(error);
+//         if (interaction.replied || interaction.deferred) {
+//             await interaction.followUp({ content: 'There was an error executing this command!', ephemeral: true });
+//         } else {
+//             await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
+//         }
+//     }
+// });
 
 client.on(Events.Warn, (warning) => {
     console.warn(`⚠️ [Discord Warning] ${warning}`);
