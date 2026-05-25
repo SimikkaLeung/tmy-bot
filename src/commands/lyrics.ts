@@ -26,7 +26,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             return;
         }
 
-        // const firstSong = searches[0];
+        // const songResult = searches[0];
         if (searches && searches[0]) {
             let songResult = searches[0];
 
@@ -35,8 +35,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             .setURL(songResult.url)
             .setAuthor({ name: songResult.artist.name, iconURL: songResult.artist.image })
             .setThumbnail(songResult.image)
-            .setDescription('Full lyrics for **${firstSong.title}** by ' + 
-                '**${firstSong.artist.name}** are available directly on Genius.\n\n' + 
+            .setDescription('Full lyrics for **${songResult.title}** by ' + 
+                '**${songResult.artist.name}** are available directly on Genius.\n\n' + 
                 'Click the title link above to view them wrapped cleanly with synchronized track alignments!')
             .setColor('#FFFF00') // Genius Yellow brand color!
             .setFooter({ text: 'Powered by Genius API & genius-lyrics wrapper' });
