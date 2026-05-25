@@ -1,7 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import Genius from 'genius-lyrics';
 
-// Initialize the Genius Client using your environment variable
 const Client = new Genius.Client(process.env['GENIUS_ACCESS_TOKEN']);
 
 export const data = new SlashCommandBuilder()
@@ -30,23 +29,19 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         // const firstSong = searches[0];
         if (searches && searches[0]) {
             let songResult = searches[0];
-            let lyrics = await songResult?.lyrics();
-
-            if (lyrics?.length && lyrics.length > 1800) {
-                lyrics = lyrics.substring(0, 1750) + `...\n\n[Read the full lyrics on Genius](${songResult.url})`;
-            }
 
             const embed = new EmbedBuilder()
             .setTitle(songResult.title)
             .setURL(songResult.url)
             .setAuthor({ name: songResult.artist.name, iconURL: songResult.artist.image })
             .setThumbnail(songResult.image)
-            .setDescription(lyrics || "*Instrumental track / No lyrics text found.*")
+            .setDescription('Full lyrics for **${firstSong.title}** by ' + 
+                '**${firstSong.artist.name}** are available directly on Genius.\n\n' + 
+                'Click the title link above to view them wrapped cleanly with synchronized track alignments!')
             .setColor('#FFFF00') // Genius Yellow brand color!
             .setFooter({ text: 'Powered by Genius API & genius-lyrics wrapper' });
 
         await interaction.editReply({ embeds: [embed] });
-
         }
 
 
