@@ -19,7 +19,17 @@ const client = new Client({
 (client as any).commands = new Collection();
 
 const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
+// ❌ OLD FILTER:
+// const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
+
+const commandFiles = fs.readdirSync(commandsPath).filter(file => {
+    // 1. Must be a JS file (production) or TS file (local dev)
+    const isTargetFile = file.endsWith('.js') || file.endsWith('.ts');
+    // 2. But must NOT be a TypeScript declaration type file (.d.ts)
+    const isDeclarationFile = file.endsWith('.d.ts');
+    
+    return isTargetFile && !isDeclarationFile;
+});
 
 const loadCommands = async () => {
     for (const file of commandFiles) {
