@@ -1,30 +1,25 @@
-import { Client, Collection, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
-import * as dotenv from 'dotenv';
-import * as fs from 'node:fs';
-import { createServer } from 'node:http';
-import * as path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-
-dotenv.config();
+import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { pathToFileURL } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-    ],
+        GatewayIntentBits.MessageContent
+    ]
 });
 
+// Initialize the internal memory cache mapping
 (client as any).commands = new Collection();
+
 const commandsPath = path.join(__dirname, 'commands');
-
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-
-const commandsData: any[] = [];
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 
 const loadCommands = async () => {
     for (const file of commandFiles) {
@@ -36,10 +31,9 @@ const loadCommands = async () => {
             const command = importedFile.default ? importedFile.default : importedFile;
 
             if (command && 'data' in command && 'execute' in command) {
+                // This saves the file to your bot's internal brain map
                 (client as any).commands.set(command.data.name, command);
-                console.log(`✅ Cached memory mapping for: /${command.data.name}`);
-            } else {
-                console.log(`⚠️ Skipped file ${file} - Data or Execute properties missing.`);
+                console.log(`🧠 Loaded & cached command memory: /${command.data.name}`);
             }
         } catch (error) {
             console.error(`❌ Failed to load command file ${file}:`, error);
@@ -47,68 +41,31 @@ const loadCommands = async () => {
     }
 };
 
+// 1. Freeze timeline until memory map is 100% full
 await loadCommands();
 
-
-const PORT = parseInt(process.env['PORT'] || '8000', 10);
-const server = createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('OK');
-});
-
-server.listen(PORT, '0.0.0.0', async () => {
-    console.log(`Health check server listening on port ${PORT}`);
-    try {
-        await client.login(process.env['DISCORD_TOKEN']);
-    } catch (error) {
-        console.error('Failed to log in to Discord:', error);
-    }
-});
-
-client.once(Events.ClientReady, async (readyClient) => {
-    console.log(`Logged in as ${readyClient.user.tag}`);
-    const token = process.env['DISCORD_TOKEN'];
-    if (!token) return;
-
-    const rest = new REST({ version: '10' }).setToken(token);
-    try {
-        console.log(`Publishing ${commandsData.length} commands to Discord...`);
-        await rest.put(
-            Routes.applicationCommands(readyClient.user.id),
-            { body: commandsData },
-        );
-        console.log('Successfully reloaded application (/) commands.');
-    } catch (error) {
-        console.error('Error deploying slash commands:', error);
-    }
-});
-
-client.on(Events.InteractionCreate, async (interaction) => {
+// 2. Listen for users running commands in chat channels
+client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    // Fetch the matched command object dynamically out of our collection cache
     const command = (client as any).commands.get(interaction.commandName);
-
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
+    if (!command) return;
 
     try {
-        // Run the command's specific file execution code
         await command.execute(interaction);
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error executing this command!', ephemeral: true });
+            await interaction.followUp({ content: '⚠️ There was an error executing this command!', ephemeral: true });
         } else {
-            await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
+            await interaction.reply({ content: '⚠️ There was an error executing this command!', ephemeral: true });
         }
     }
 });
 
-client.on(Events.Warn, (warning) => {
-    console.warn(`⚠️ [Discord Warning] ${warning}`);
-});
+// 3. Fire up the gateway engine connection
+client.login(process.env.DISCORD_TOKEN);
 
-server.on('error', (err) => console.error('Server error:', err.message));
+client.once('ready', () => {
+    console.log(`🤖 Logged in successfully! Bot user is online.`);
+});
