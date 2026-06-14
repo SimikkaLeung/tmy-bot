@@ -69,7 +69,7 @@ server.listen(PORT, '0.0.0.0', async () => {
 });
 
 // 4. Client Handlers & Interaction Gateways
-client.once('ready', (readyClient) => {
+client.once('clientReady', (readyClient) => {
     console.log(`🤖 Logged in successfully! Connected as ${readyClient.user.tag}`);
 });
 
