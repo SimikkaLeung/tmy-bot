@@ -7,7 +7,7 @@ const spotify = SpotifyApi.withClientCredentials(
 
 export async function getRandomTrackFromPlaylist(playlistInput: string) {
     try {
-=
+        // 1. Clean the ID inputs
         const playlistId = playlistInput.includes('playlist/') 
             ? playlistInput.split('playlist/')[1]?.split('?')[0] 
             : playlistInput.trim();
