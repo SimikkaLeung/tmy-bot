@@ -7,13 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "npm run deploy && node dist/index.js",
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch --env-file=.env src/index.ts",
     "deploy": "tsx src/deploy-commands.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@spotify/web-api-ts-sdk": "^1.2.0",
     "discord.js": "^14.26.4",
     "dotenv": "^17.4.2",
     "genius-lyrics": "^4.4.7"

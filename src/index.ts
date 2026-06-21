@@ -1,11 +1,11 @@
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
-import * as dotenv from 'dotenv';
+// import * as dotenv from 'dotenv';
 import * as fs from 'node:fs';
 import { createServer } from 'node:http';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-dotenv.config();
+// dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
