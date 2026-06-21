@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "npm run deploy && node dist/index.js",
-    "dev": "tsx watch --env-file=.env src/index.ts",
-    "deploy": "tsx src/deploy-commands.ts"
-  },
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "build": "tsc",
+  "start": "node dist/index.js",
+  "dev": "tsx watch --env-file=.env src/index.ts",
+  "deploy": "tsx src/deploy-commands.ts"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
