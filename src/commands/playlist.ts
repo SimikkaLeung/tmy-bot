@@ -81,7 +81,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
             await newThread.setLocked(true, 'Prevent non-admin users from corrupting database text data');
             // Post a seed metadata message. This represents index #0.
-            await newThread.send(`⚙️ METADATA || TYPE: ${type.toUpperCase()}`);
+            await newThread.send(`⚙️ METADATA | TYPE: ${type.toUpperCase()}`);
             return interaction.editReply(`✅ Created new **${type}** playlist thread: <#${newThread.id}>`);
         }
 
@@ -94,11 +94,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             
             // Fetch messages to compute the next incremental numeric index order
             const messages = await thread.messages.fetch({ limit: 100 });
-            const itemRecords = Array.from(messages.values()).filter(m => m.content.includes('TRACK ||'));
+            const itemRecords = Array.from(messages.values()).filter(m => m.content.includes('TRACK |'));
             const nextOrderNumber = itemRecords.length + 1;
 
             // Save row entry
-            await thread.send(`TRACK || #${nextOrderNumber} || ${link}`);
+            await thread.send(`TRACK | #${nextOrderNumber} | ${link}`);
             return interaction.editReply(`✅ Added to **${thread.name}** as track **#${nextOrderNumber}**!`);
         }
 
@@ -107,7 +107,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             const messages = await thread.messages.fetch({ limit: 100 });
             // Sort oldest first so order reads 1, 2, 3...
             const trackRecords = Array.from(messages.values())
-                .filter(m => m.content.includes('TRACK ||'))
+                .filter(m => m.content.includes('TRACK |'))
                 .sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
             if (trackRecords.length === 0) {
@@ -116,7 +116,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
             let responseMenu = `🎵 **Track list for ${thread.name}:**\n\n`;
             trackRecords.forEach((msg, index) => {
-                const parts = msg.content.split(' || ');
+                const parts = msg.content.split(' | ');
                 const originalLink = parts[2]
                 responseMenu += `**${index + 1}.** ${originalLink}\n`;
             });
@@ -131,7 +131,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             
             // Sort oldest first to reliably track positional maps
             const trackRecords = Array.from(messages.values())
-                .filter(m => m.content.includes('TRACK ||'))
+                .filter(m => m.content.includes('TRACK |'))
                 .sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
             if ((targetIndex < 1 || targetIndex > trackRecords.length)) {
@@ -153,7 +153,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                 const message = remainingMessages[i];
                 if (!message) continue;
 
-                const parts = message.content.split(' || ');
+                const parts = message.content.split(' | ');
                 if ( !parts[2] || parts[2]?.trim().length == 0 ) {
                     continue;
                 }
@@ -161,7 +161,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                 const urlStr = parts[2]; // Using parts[2] as per your design!
 
                 expectedNewIndex += 1; 
-                const str = 'TRACK || ' + expectedNewIndex + ' || ' + urlStr;
+                const str = 'TRACK | #' + expectedNewIndex + ' | ' + urlStr;
 
                 try {
                     // Step A: Delete the old un-indexed/wrongly indexed message record
