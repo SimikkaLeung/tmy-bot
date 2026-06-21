@@ -161,7 +161,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                 const urlStr = parts[2]; // Using parts[2] as per your design!
 
                 expectedNewIndex += 1; 
-                const str = 'TRACK || ' + expectedNewIndex + ' || ${urlStr}';
+                const str = 'TRACK || ' + expectedNewIndex + ' || ' + urlStr;
 
                 try {
                     // Step A: Delete the old un-indexed/wrongly indexed message record
