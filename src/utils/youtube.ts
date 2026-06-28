@@ -59,7 +59,16 @@ export async function getRandomTrackFromPlaylist(playlistId: string): Promise<Yo
             maxResults: maxResultsPerPage,
             pageToken: pageToken ??''
         });
-
+        // ────────── ADD THESE LOGS HERE ──────────
+        console.log("=== YOUTUBE ROUTER DEBUG ===");
+        console.log("1. Total items count from API:", totalVideos);
+        console.log("2. Chosen global randomIndex:", randomIndex);
+        console.log("3. Calculated targetPageNumber:", Math.floor(randomIndex / 50));
+        console.log("4. Page Token used for final fetch:", pageToken === undefined ? "undefined (Page 0)" : pageToken);
+        console.log("5. Number of items returned on this page:", finalPageResponse.data.items?.length);
+        console.log("6. Remainder index used on this page array:", randomIndex % 50);
+        console.log("=============================");
+        
         const targetItem = finalPageResponse.data.items?.[itemIndexOnPage]?.snippet;
 
         if (!targetItem || !targetItem.resourceId?.videoId) {
