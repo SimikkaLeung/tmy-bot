@@ -59,7 +59,13 @@ export async function getRandomTrackFromPlaylist(playlistId: string): Promise<Yo
             maxResults: maxResultsPerPage,
             pageToken: pageToken ??''
         });
-        // ────────── ADD THESE LOGS HERE ──────────
+
+        if (finalPageResponse.status >= 400) {
+            console.error("🚨 YouTube API Error Status:", finalPageResponse.status);
+            console.error("🚨 Details:", finalPageResponse.data);
+            console.log("The bot is experiencing an internal configuration error.");
+        }
+        
         console.log("=== YOUTUBE ROUTER DEBUG ===");
         console.log("1. Total items count from API:", totalVideos);
         console.log("2. Chosen global randomIndex:", randomIndex);
