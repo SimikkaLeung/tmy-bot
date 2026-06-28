@@ -36,18 +36,9 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     const playlistId = extractPlaylistId(userInput);
 
-
-    const track = await getRandomTrackFromPlaylist(playlistId);
     try {
         const track = await getRandomTrackFromPlaylist(playlistId);
 
-    } catch (error) {
-        if (error instanceof Error) {
-            await  interaction.editReply(error.message); 
-        }
-        await interaction.editReply("An unexpected error occurred.");
-    }
-    
     if (!track) {
         await interaction.editReply({
             content: '❌ **Roulette Failed!** I couldn\'t fetch any videos. Please verify the playlist is **public** and the ID/URL is correct.'
@@ -70,4 +61,11 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         content: `🎵 **Here is your random pick!** \n${track.videoUrl}`,
         embeds: [embed]
     });
+
+    } catch (error) {
+        if (error instanceof Error) {
+            await  interaction.editReply(error.message); 
+        }
+        await interaction.editReply("An unexpected error occurred.");
+    }
 }
