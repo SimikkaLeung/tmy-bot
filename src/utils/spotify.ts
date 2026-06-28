@@ -22,6 +22,7 @@ export async function getRandomTrackFromPlaylist(playlistInput: string) {
             0        // We want 0 items right now, keeping it ultra fast
         );
         
+
         console.log(`📡 RAW SPOTIFY RESPONSE FOR ID [${playlistId}]:`, JSON.stringify(trackingPayload));
         console.log(`🔢 EXTRACED TOTAL TRACKS:`, trackingPayload?.total);
 

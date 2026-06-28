@@ -48,7 +48,7 @@ const loadCommands = async () => {
     }
 };
 
-// 1. Load your local commands into memory first
+// 1. Load local commands into memory first
 await loadCommands();
 
 // 2. Setup the Web Service Health Check Server for Koyeb

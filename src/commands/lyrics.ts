@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import Genius from 'genius-lyrics';
 
-const Client = new Genius.Client(process.env['GENIUS_ACCESS_TOKEN']);
+const Client = new Genius.Client(process.env.GENIUS_ACCESS_TOKEN);
 
 export const data = new SlashCommandBuilder()
     .setName('lyrics')

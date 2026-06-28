@@ -2,7 +2,6 @@ import {
     SlashCommandBuilder, 
     ChatInputCommandInteraction, 
     TextChannel, 
-    ThreadChannel,
     PermissionFlagsBits
 } from 'discord.js';
 
@@ -14,7 +13,7 @@ export const data = new SlashCommandBuilder()
             .setDescription('Create a new playlist thread')
             .addStringOption(o => o.setName('name').setDescription('Name of the playlist').setRequired(true))
             .addStringOption(o => o.setName('type').setDescription('Platform type').setRequired(true)
-                .addChoices({ name: 'YouTube', value: 'youtube' }, { name: 'Spotify', value: 'spotify' }))
+                .addChoices({ name: 'YouTube', value: 'youtube' }))
     )
     .addSubcommand(sub =>
         sub.setName('add')
@@ -71,7 +70,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             
             const type = interaction.options.getString('type', true);
             
-            // Create a dedicated thread for this playlist
             const newThread = await channel.threads.create({
                 name: playlistName!,
                 autoArchiveDuration: 10080,
@@ -85,7 +83,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             return interaction.editReply(`✅ Created new **${type}** playlist thread: <#${newThread.id}>`);
         }
 
-        // For all other commands, the target thread MUST already exist
         if (!thread) return interaction.editReply(`❌ Playlist "${playlistName}" not found. Create it first.`);
 
         // --- SUBCOMMAND: ADD ---
@@ -179,7 +176,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                 }
             }
 
-            // 2. Formulate an intelligent response based on the sync outcome
             if (failedTrackMap.size === 0) {
                 return interaction.editReply(`🗑️ Successfully removed track #${targetIndex} and cleanly re-sequenced the playlist order!`);
             } else {

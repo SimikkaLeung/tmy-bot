@@ -51,7 +51,9 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
         );
 
         console.log('✅ Successfully published all slash commands! They are now live.');
+        process.exit(0);
     } catch (error) {
         console.error('❌ Error publishing commands:', error);
+        process.exit(1);
     }
 })();

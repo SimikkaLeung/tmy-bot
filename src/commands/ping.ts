@@ -5,7 +5,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('Replies with Pong and shows bot latency!');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-    // Calculate the ping time difference
+
     const sent = await interaction.reply({ content: 'Pinging...', withResponse: true });
 
     const latency = sent.resource?.message?.createdTimestamp ? 
