@@ -64,8 +64,10 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     } catch (error) {
         if (error instanceof Error) {
-            await  interaction.editReply(error.message); 
+            await interaction.editReply(error.message); 
+            return;
         }
         await interaction.editReply("An unexpected error occurred.");
+        return;
     }
 }
