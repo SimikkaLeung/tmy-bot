@@ -16,6 +16,8 @@ interface YouTubeTrack {
 /**
  * Grabs a completely random video from a public YouTube playlist
  * @param playlistId The string ID from the playlist URL (the part after "list=")
+ * @returns A promise resolving to a YouTubeTrack or null if empty.
+ * @throws {Error} Throws an error if the YouTube API returns a 400+ status codd.
  */
 export async function getRandomTrackFromPlaylist(playlistId: string): Promise<YouTubeTrack | null> {
     try {
@@ -61,11 +63,15 @@ export async function getRandomTrackFromPlaylist(playlistId: string): Promise<Yo
         });
 
         if (finalPageResponse.status >= 400) {
-            console.error("🚨 YouTube API Error Status:", finalPageResponse.status);
-            console.error("🚨 Details:", finalPageResponse.data);
-            console.log("The bot is experiencing an internal configuration error.");
+            // 🪵 For Your Eyes Only (Detailed & Actionable in Koyeb)
+            console.error(`🚨 YouTube API Error [Status ${finalPageResponse.status}]`);
+            console.error("📋 Error Payload Details:", JSON.stringify(finalPageResponse.data, null, 2));
+
+            // 💬 For The User (Clean, safe, and generic)
+            throw new Error("Something went wrong while fetching the playlist. " + 
+                "Please verify the link is public, or try again later.");
         }
-        
+
         console.log("=== YOUTUBE ROUTER DEBUG ===");
         console.log("1. Total items count from API:", totalVideos);
         console.log("2. Chosen global randomIndex:", randomIndex);
@@ -89,6 +95,9 @@ export async function getRandomTrackFromPlaylist(playlistId: string): Promise<Yo
 
     } catch (error) {
         console.error('🚨 YouTube API Error:', error);
+        if (error instanceof Error) {
+            throw error;
+        }
         return null;
     }
 }
