@@ -4,6 +4,7 @@ import * as fs from 'node:fs';
 import { createServer } from 'node:http';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { startDiscordScheduler } from './utils/scheduler.js';
 
 // dotenv.config();
 
@@ -18,11 +19,9 @@ const client = new Client({
     ],
 });
 
-// Initialize the internal memory cache mapping
 (client as any).commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
 
-// Read local files while safely ignoring .d.ts files
 const commandFiles = fs.readdirSync(commandsPath).filter(file => {
     const isTargetFile = file.endsWith('.js') || file.endsWith('.ts');
     const isDeclarationFile = file.endsWith('.d.ts');
@@ -48,17 +47,17 @@ const loadCommands = async () => {
     }
 };
 
-// 1. Load local commands into memory first
+
 await loadCommands();
 
-// 2. Setup the Web Service Health Check Server for Koyeb
+// Setup the Web Service Health Check Server for Koyeb
 const PORT = parseInt(process.env['PORT'] || '8000', 10);
 const server = createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('OK');
 });
 
-// 3. Open Port 8000 to pass Koyeb checks, then safely connect the Discord client
+// Open Port 8000 to pass Koyeb checks, then safely connect the Discord client
 server.listen(PORT, '0.0.0.0', async () => {
     console.log(`📡 Health check server listening on port ${PORT}`);
     try {
@@ -68,9 +67,10 @@ server.listen(PORT, '0.0.0.0', async () => {
     }
 });
 
-// 4. Client Handlers & Interaction Gateways
+// Client Handlers & Interaction Gateways
 client.once('clientReady', (readyClient) => {
     console.log(`🤖 Logged in successfully! Connected as ${readyClient.user.tag}`);
+    startDiscordScheduler(client);
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -100,3 +100,4 @@ client.on('warn', (warning) => {
 });
 
 server.on('error', (err) => console.error('Server error:', err.message));
+
