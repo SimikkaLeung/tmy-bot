@@ -110,6 +110,7 @@ export function startDiscordScheduler(client: Client) {
                             console.log(`⏱️ Auto-triggering automation for thread: ${playlistThread.name}`);
                             
                             const randomLink = await getRandomTrackFromThread(playlistThread);
+                            console.log(`🎲 Playlist ${randomLink} is picked.`);
                             if (!randomLink) {
                                 console.warn(`⚠️ [TMY-Scheduler] Could not extract a valid playlist link string from thread: ${playlistThread.name}`);
                                 continue;
