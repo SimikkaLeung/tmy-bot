@@ -5,7 +5,7 @@ import { ytRoulette } from '../commands/yt-roulette.js';
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
 export function startDiscordScheduler(client: Client) {
-
+    console.log(`startDiscordScheduler`)
     setInterval(async () => {
         const now = Date.now();
 
@@ -75,6 +75,7 @@ export function startDiscordScheduler(client: Client) {
 
                 if (shouldTrigger) {
                     try {
+                        console.log(`targetChannel: ${dstId} , playlistThread: ${srcId}`);
                         const targetChannel = await client.channels.fetch(dstId) as TextChannel;
                         const playlistThread = await client.channels.fetch(srcId) as ThreadChannel;
 
