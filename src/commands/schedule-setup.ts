@@ -72,10 +72,13 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     if (timeInput && timeInput.length === 4 ) {
         const hh = timeInput.substring(0,2);
         const mm = timeInput.substring(2,4);
-        if (hh >= '00' && hh <= '23' && mm >= '00' && hh <= '59')
-        timeInput = hh + ":" + mm;
+        if (hh >= '00' && hh <= '23' && mm >= '00' && mm <= '59') {
+            timeInput = hh + ":" + mm;
+        } else {
+            timeInput = "10:00"
+        }
     } else {
-        timeInput = "00:00"
+        timeInput = "12:00"
     }
     const timeChoice = timeInput;
     // const timeChoice = interaction.options.getString('time', false) ?? new Date().getTime;
