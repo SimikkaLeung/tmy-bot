@@ -56,7 +56,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
 
-    const playlistThread = interaction.options.getChannel('playlist_thread', true);
+    const playlistThread = interaction.options.getChannel('playlist_thread', true) as ThreadChannel;
     const targetChannel = interaction.options.getChannel('target_channel', true);
     const frequency = interaction.options.getString('frequency', true);
     const timeChoice = interaction.options.getString('time', true) ?? new Date().getTime;
