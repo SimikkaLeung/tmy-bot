@@ -22,6 +22,16 @@ export const data = new SlashCommandBuilder()
             .setRequired(true)
     )
     .addStringOption(option =>
+        option.setName('actions')
+            .setDescription('The logic the scheduler should execute')
+            .setRequired(true)
+            .addChoices(
+                { name: 'YoutTube Roulette Only', value: 'yt-roulette' },
+                // { name: 'Lyric Only', value: 'lyric' },
+                // { name: 'Both', value: 'both' }
+            )
+    )
+    .addStringOption(option =>
         option.setName('frequency')
             .setDescription('How often should this run?')
             .setRequired(true)
@@ -40,16 +50,6 @@ export const data = new SlashCommandBuilder()
                 { name: 'Morning (08:00 UTC)', value: '08:00' },
                 { name: 'Noon (12:00 UTC)', value: '12:00' },
                 { name: 'Evening (20:00 UTC)', value: '20:00' }
-            )
-    )
-    .addStringOption(option =>
-        option.setName('actions')
-            .setDescription('The logic the scheduler should execute')
-            .setRequired(true)
-            .addChoices(
-                { name: 'YoutTube Roulette Only', value: 'yt-roulette' },
-                // { name: 'Lyric Only', value: 'lyric' },
-                // { name: 'Both', value: 'both' }
             )
     );
 
