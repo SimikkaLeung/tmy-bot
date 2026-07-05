@@ -115,7 +115,7 @@ export function startDiscordScheduler(client: Client) {
                                 continue;
                             }
                             const playlistId = extractPlaylistId(randomLink);
-                            const randomTrack = await getRandomTrackFromPlaylist(randomLink!);
+                            const randomTrack = await getRandomTrackFromPlaylist(playlistId!);
 
                             if (!randomTrack) {
                                 await targetChannel.send(`⚠️ Scheduled event triggered, but I couldn't find any tracks inside the **#${playlistThread.name}** thread.`);
