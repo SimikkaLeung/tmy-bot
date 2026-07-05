@@ -62,6 +62,13 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
 
     const channel = interaction.channel as TextChannel;
+    if (!channel || channel.name.toLowerCase() !== 'tmy-settings') {
+        return interaction.reply({ 
+            content: '❌ This command can only be used inside a channel named `#tmy-settings`.', 
+            ephemeral: true 
+        });
+    }
+
     const threadManager = await channel.threads.fetch();
     const playlistThread = threadManager.threads.find(t => t.name.toLowerCase() === interaction.options.getString('playlist_thread', true));
 
