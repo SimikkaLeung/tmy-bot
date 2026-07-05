@@ -1,4 +1,4 @@
-import { Client, Collection, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
+import { Client, Collection, EmbedBuilder, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
 import { getRandomTrackFromThread } from './trackPicker.js';
 import { ytRoulette } from '../commands/yt-roulette.js';
 
@@ -80,21 +80,27 @@ export function startDiscordScheduler(client: Client) {
 
                         if (targetChannel && playlistThread) {
                             console.log(`⏱️ Auto-triggering automation for thread: ${playlistThread.name}`);
-                            
+                            console.log("playlistThread.id: " + playlistThread.id)
                             const randomTrack = await getRandomTrackFromThread(playlistThread);
-
+                            console.log("randomTrack: " + randomTrack)
                             if (!randomTrack) {
                                 await targetChannel.send(`⚠️ Scheduled event triggered, but I couldn't find any tracks inside the **#${playlistThread.name}** thread.`);
                             } else {
                                 let outputMessage = "";
-
                                 if (actionStr === 'yt-roulette') {
-                                    const embed = await ytRoulette(randomTrack);
                                     outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${randomTrack}`;
-                                    if (embed) {
+                                    console.log("outputMessage1: " + outputMessage)
+                                    const embed = await ytRoulette(randomTrack);
+                                    outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${embed?.data.url}`;
+                                    console.log("outputMessage2: " + outputMessage)
+                                    if (embed instanceof EmbedBuilder) {
                                         await targetChannel.send({
                                             content: outputMessage,
                                             embeds: [embed]
+                                        });
+                                    } else {
+                                        await targetChannel.send({
+                                            content: `Failed to play a track.`
                                         });
                                     }
 
