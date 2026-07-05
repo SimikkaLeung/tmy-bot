@@ -1,5 +1,6 @@
 import { Client, Collection, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
 import { getRandomTrackFromThread } from './trackPicker.js';
+import { getRandomTrackFromPlaylist } from './youtube.js';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
@@ -8,7 +9,7 @@ export function startDiscordScheduler(client: Client) {
     setInterval(async () => {
         const now = Date.now();
 
-        const channels = client.channels?.cache.filter(
+        let channels = client.channels?.cache.filter(
             c => c.isTextBased() && !c.isThread()
         ) as Collection<string, TextChannel>;
         
@@ -46,7 +47,9 @@ export function startDiscordScheduler(client: Client) {
                 const freq  = text.match(/\[FREQ:(.*?)\]/)?.[1];  // 'hourly' | 'daily' | 'weekly'
                 const timeStr = text.match(/\[TIME:(.*?)\]/)?.[1] || "00:00"; // e.g. "12:00"
                 const actionStr = text.match(/\[ACT:(.*?)\]/)?.[1];
-                const lastRun = parseInt(text.match(/\[RUN:(\d+)\]?/)?.[1] || text.match(/\[RUN:(\d+)\]/)?.[1] || "0");
+                // const lastRun = parseInt(text.match(/\[RUN:(\d+)\]?/)?.[1] || text.match(/\[RUN:(\d+)\]/)?.[1] || "0");
+                const runMatch = text.match(/\[RUN:(\d+)\]/)?.[1];
+                const lastRun = runMatch ? parseInt(runMatch) : 0;
 
                 if (!srcId || !dstId || !freq) continue;
 
@@ -80,7 +83,11 @@ export function startDiscordScheduler(client: Client) {
                         if (targetChannel && playlistThread) {
                             console.log(`⏱️ Auto-triggering automation for thread: ${playlistThread.name}`);
                             
-                            const randomTrack = await getRandomTrackFromThread(playlistThread);
+                            const randomLink = await getRandomTrackFromThread(playlistThread);
+                            if (!randomLink) {
+                                continue;
+                            }
+                            const randomTrack = await getRandomTrackFromPlaylist(randomLink);
 
                             if (!randomTrack) {
                                 await targetChannel.send(`⚠️ Scheduled event triggered, but I couldn't find any tracks inside the **#${playlistThread.name}** thread.`);
@@ -111,8 +118,12 @@ export function startDiscordScheduler(client: Client) {
                     }
 
                     // Update Discord's "Database" entry message with the new run timestamp
-                    const updatedText = text.replace(/\[RUN:\d+\]/, `[RUN:${now}]`)
-                                            .replace(/\*Last updated: .*\*$/, `*Last updated: <t:${Math.floor(now / 1000)}:R>*`);
+                    let updatedText = text;
+                    if (text.includes('[RUN:')) {
+                        updatedText = text.replace(/\[RUN:\d+\]/, `[RUN:${now}]`);
+                    } else {
+                        updatedText = text + `\n[RUN:${now}]`;
+                    }
                     
                     await msg.edit(updatedText);
                 }
