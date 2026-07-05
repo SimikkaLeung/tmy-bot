@@ -125,7 +125,7 @@ export function startDiscordScheduler(client: Client) {
                                 let outputMessage = "";
 
                                 if (actionStr === 'yt-roulette') {
-                                    outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${randomTrack}`;
+                                    outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${randomTrack.videoUrl}`;
                                     await targetChannel.send(outputMessage);
                                 } 
                                 
