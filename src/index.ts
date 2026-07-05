@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { startDiscordScheduler } from './utils/scheduler.js';
 
 // dotenv.config();
+console.log("=== KOYEB DEPLOY TEST: LOGS ARE WORKING ===");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

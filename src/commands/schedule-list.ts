@@ -36,7 +36,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
         // Fetch the configuration records (bot logs)
         const messages = await scheduleThread.messages.fetch({ limit: 50 });
-        const configMessages = messages.filter(msg => msg.content.includes('⚙️ TMY AUTOMATION CONFIGURATION'));
+        const configMessages = messages.filter(msg => msg.content.includes('TMY AUTOMATION CONFIGURATION'));
 
         if (configMessages.size === 0) {
             return interaction.editReply({ content: "ℹ️ There are currently no active automated schedules configured." });

@@ -82,10 +82,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         if (hh >= '00' && hh <= '23' && mm >= '00' && mm <= '59') {
             timeInput = hh + ":" + mm;
         } else {
-            timeInput = "10:00"
+            timeInput = "00:00"
         }
     } else {
-        timeInput = "12:00"
+        timeInput = "00:00"
     }
     const timeChoice = timeInput;
     // const timeChoice = interaction.options.getString('time', false) ?? new Date().getTime;
