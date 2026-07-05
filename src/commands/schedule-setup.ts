@@ -34,7 +34,7 @@ export const data = new SlashCommandBuilder()
     .addStringOption(option =>
         option.setName('time')
             .setDescription('At what time? (Ignored for Hourly schedules) (UTC)')
-            .setRequired(true)
+            .setRequired(false)
             .addChoices(
                 { name: 'Midnight (00:00 UTC)', value: '00:00' },
                 { name: 'Morning (08:00 UTC)', value: '08:00' },
@@ -59,7 +59,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const playlistThread = interaction.options.getChannel('playlist_thread', true);
     const targetChannel = interaction.options.getChannel('target_channel', true);
     const frequency = interaction.options.getString('frequency', true);
-    const timeChoice = interaction.options.getString('time', true);
+    const timeChoice = interaction.options.getString('time', true) ?? new Date().getTime;
     const actions = interaction.options.getString('actions', true);
 
 
