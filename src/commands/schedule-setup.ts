@@ -64,7 +64,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     // const playlistThread = interaction.options.getChannel('playlist_thread', true) as ThreadChannel;
     const targetChannel = interaction.options.getChannel('target_channel', true);
     const frequency = interaction.options.getString('frequency', true);
-    const timeChoice = interaction.options.getString('time', true) ?? new Date().getTime;
+    const timeChoice = interaction.options.getString('time', false) ?? new Date().getTime;
     const actions = interaction.options.getString('actions', true);
 
     try {
