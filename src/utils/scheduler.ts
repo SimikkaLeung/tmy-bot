@@ -1,4 +1,4 @@
-import { Client, Collection, GatewayIntentBits, TextChannel, ThreadChannel } from 'discord.js';
+import { Client, Collection, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
 import { getRandomTrackFromThread } from './trackPicker.js';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -8,17 +8,27 @@ export function startDiscordScheduler(client: Client) {
     setInterval(async () => {
         const now = Date.now();
 
-        const channels = client.channels.cache.filter(
+        const channels = client.channels?.cache.filter(
             c => c.isTextBased() && !c.isThread()
         ) as Collection<string, TextChannel>;
         
         let scheduleThread: ThreadChannel | null = null;
         for (const [_, ch] of channels) {
-            const found = ch.threads.cache.find(t => t.name === 'tmy-schedules');
-            if (found) {
-                scheduleThread = found as ThreadChannel;
-                break;
+            try {
+                let found : ThreadChannel | undefined = ch.threads?.cache.find(t => t.name === 'tmy-schedules') as ThreadChannel | undefined;
+                if (!found && ch.threads) {
+                    const activeThreads = await ch.threads.fetchActive();
+                    found = activeThreads.threads.find(t => t.name === 'tmy-schedules') as ThreadChannel | undefined;
+                }
+
+                if (found) {
+                    scheduleThread = found as ThreadChannel;
+                    break;
+                }
+            } catch (e) {
+                continue;
             }
+
         }
 
         if (!scheduleThread) return; 
