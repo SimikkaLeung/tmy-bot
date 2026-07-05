@@ -69,17 +69,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const targetChannel = interaction.options.getChannel('target_channel', true);
     const frequency = interaction.options.getString('frequency', true);
     let timeInput = interaction.options.getString('time_hhmm', false);
+    console.log("timeInput1: " + timeInput);
     if (timeInput && timeInput.length === 4 ) {
         const hh = timeInput.substring(0,2);
         const mm = timeInput.substring(2,4);
         if (hh >= '00' && hh <= '23' && mm >= '00' && mm <= '59') {
             timeInput = hh + ":" + mm;
+            console.log("timeInput2: " + timeInput);
         } else {
             timeInput = "10:00"
+            console.log("timeInput3: " + timeInput);
         }
     } else {
         timeInput = "12:00"
+        console.log("timeInput4: " + timeInput);
     }
+    console.log("timeInput: " + timeInput);
     const timeChoice = timeInput;
     // const timeChoice = interaction.options.getString('time', false) ?? new Date().getTime;
     const actions = interaction.options.getString('actions', true);
