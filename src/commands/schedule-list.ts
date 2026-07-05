@@ -45,11 +45,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             const srcId = msg.content.match(/\[SRC:(.*?)\]/)?.[1] ?? 'Unknown';
             const dstId = msg.content.match(/\[DST:(.*?)\]/)?.[1] ?? 'Unknown';
             const freq = msg.content.match(/\[FREQ:(.*?)\]/)?.[1] ?? 'Unknown';
+            const time_hhmm = msg.content.match(/\[TIME:(.*?)\]/)?.[1] ?? 'Unknown';
             const action = msg.content.match(/\[ACT:(.*?)\]/)?.[1] ?? 'Unknown';
 
             embed.addFields({
                 name: `Schedule #${count++}`,
-                value: `• **Source Thread ID:** \`${srcId}\`\n• **Target Channel ID:** \`${dstId}\`\n• **Interval / CRON:** \`${freq}\`\n• **Action Type:** \`${action}\`\n*ID for removal:* \`${msg.id}\``
+                value: `• **Source Thread ID:** \`${srcId}\`\n• **Target Channel ID:** \`${dstId}\`\n• **Frequency:** \`${freq}\`\n• **Time:** \`${time_hhmm}\`\n• **Action Type:** \`${action}\`\n*ID for removal:* \`${msg.id}\``
             });
         });
 
