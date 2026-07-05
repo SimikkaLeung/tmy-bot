@@ -41,7 +41,7 @@ export const data = new SlashCommandBuilder()
             .setDescription('How often should this run?')
             .setRequired(true)
             .addChoices(
-                { name: 'Hourly', value: 'hourly' },
+                // { name: 'Hourly', value: 'hourly' },
                 { name: 'Daily', value: 'daily' },
                 { name: 'Weekly', value: 'weekly' }
             )
