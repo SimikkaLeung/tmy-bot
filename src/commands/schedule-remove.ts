@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, ThreadChannel, ChannelType } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder, ThreadChannel, ChannelType, TextChannel } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
     .setName('schedule-remove')
@@ -11,7 +11,16 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
-    
+
+    const channel = interaction.channel as TextChannel;
+    if (!channel || channel.name.toLowerCase() !== 'tmy-settings') {
+        return interaction.reply({ 
+            content: '❌ This command can only be used inside a channel named `#tmy-settings`.', 
+            ephemeral: true 
+        });
+    }
+
+
     const configId = interaction.options.getString('config_id', true);
 
     try {

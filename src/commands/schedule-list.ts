@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, ThreadChannel, ChannelType } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, ThreadChannel, ChannelType, TextChannel } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
     .setName('schedule-list')
@@ -8,6 +8,14 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     // 🛡️ Defer instantly to give the bot time to fetch messages
     await interaction.deferReply({ ephemeral: true });
 
+    const channel = interaction.channel as TextChannel;
+    if (!channel || channel.name.toLowerCase() !== 'tmy-settings') {
+        return interaction.reply({ 
+            content: '❌ This command can only be used inside a channel named `#tmy-settings`.', 
+            ephemeral: true 
+        });
+    }
+    
     try {
         // Find our global schedules master configuration thread
         let scheduleThread: ThreadChannel | undefined;
