@@ -47,15 +47,15 @@ export const data = new SlashCommandBuilder()
             )
     )
     .addStringOption(option =>
-        option.setName('time_mm:ss')
-            .setDescription('At what time? (Ignored for Hourly schedules) (UTC)')
+        option.setName('time_hhmm')
+            .setDescription('At what time in the 24-hour time format in UTC? (Ignored for Hourly schedules)')
             .setRequired(false)
-            .addChoices(
-                { name: 'Midnight (00:00 UTC)', value: '00:00' },
-                { name: 'Morning (08:00 UTC)', value: '08:00' },
-                { name: 'Noon (12:00 UTC)', value: '12:00' },
-                { name: 'Evening (20:00 UTC)', value: '20:00' }
-            )
+            // .addChoices(
+            //     { name: 'Midnight (00:00 UTC)', value: '00:00' },
+            //     { name: 'Morning (08:00 UTC)', value: '08:00' },
+            //     { name: 'Noon (12:00 UTC)', value: '12:00' },
+            //     { name: 'Evening (20:00 UTC)', value: '20:00' }
+            // )
     );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
@@ -68,7 +68,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     // const playlistThread = interaction.options.getChannel('playlist_thread', true) as ThreadChannel;
     const targetChannel = interaction.options.getChannel('target_channel', true);
     const frequency = interaction.options.getString('frequency', true);
-    const timeChoice = interaction.options.getString('time_mm:ss', false) ?? "00:00";
+    let timeInput = interaction.options.getString('time_hhmm', false);
+    if (timeInput && timeInput.length === 4 ) {
+        const hh = timeInput.substring(0,2);
+        const mm = timeInput.substring(2,4);
+        if (hh >= '00' && hh <= '23' && mm >= '00' && hh <= '59')
+        timeInput = hh + ":" + mm;
+    } else {
+        timeInput = "00:00"
+    }
+    const timeChoice = timeInput;
     // const timeChoice = interaction.options.getString('time', false) ?? new Date().getTime;
     const actions = interaction.options.getString('actions', true);
 
