@@ -91,24 +91,23 @@ export function startDiscordScheduler(client: Client) {
                                 if (actionStr === 'yt-roulette') {
                                     outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${randomTrack}`;
                                     console.log("outputMessage1: " + outputMessage)
-                                    const embed = await ytRoulette(randomTrack);
-                                    outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${embed?.data.url}`;
-                                    console.log("outputMessage2: " + outputMessage)
-                                    if (embed instanceof EmbedBuilder) {
-                                        await targetChannel.send({
-                                            content: outputMessage,
-                                            embeds: [embed]
-                                        });
-                                    } else {
-                                        await targetChannel.send({
-                                            content: `Failed to play a track.`
-                                        });
-                                    }
+                                    // const embed = await ytRoulette(randomTrack);
+                                    // outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${embed?.data.url}`;
+                                    // console.log("outputMessage2: " + outputMessage)
+                                    // if (embed instanceof EmbedBuilder) {
+                                    //     await targetChannel.send({
+                                    //         content: outputMessage,
+                                    //         embeds: [embed]
+                                    //     });
+                                    // } else {
+                                    //     await targetChannel.send({
+                                    //         content: `Failed to play a track.`
+                                    //     });
+                                    // }
 
-                                    // await interaction.editReply({
-                                    //     content: `🎵 **Here is your random pick!** \n${track.videoUrl}`,
-                                    //     embeds: [embed]
-                                    // });
+                                        await targetChannel.send({
+                                            content: outputMessage
+                                        });
                                 } 
                                 
                                 // else if (actionStr === 'lyric') {
