@@ -19,8 +19,8 @@ export async function getRandomTrackFromThread(thread: ThreadChannel): Promise<s
         const tracksArray = Array.from(validTracks.values());
 
         const randomIndex = Math.floor(Math.random() * tracksArray.length);
-
-        return tracksArray?.[randomIndex]?.content ?? null;
+        const parts = tracksArray?.[randomIndex]?.content.split(' | ');
+        return parts?.[2] ?? null;
     } catch (error) {
         console.error(`❌ Failed to fetch tracks from thread ${thread.id}:`, error);
         return null;
