@@ -15,7 +15,11 @@ export const data = new SlashCommandBuilder()
     //         .addChannelTypes(ChannelType.PublicThread, ChannelType.PrivateThread)
     //         .setRequired(true)
     // )
-    .addStringOption(o => o.setName('playlist_thread').setDescription('The Discord thread containing your track list').setRequired(true))
+    .addStringOption(option => 
+        option.setName('playlist_thread')
+            .setDescription('The Discord thread containing your track list')
+            .setRequired(true)
+    )
     .addChannelOption(option =>
         option.setName('target_channel')
             .setDescription('The text channel where the bot will automatically post')
@@ -64,7 +68,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     // const playlistThread = interaction.options.getChannel('playlist_thread', true) as ThreadChannel;
     const targetChannel = interaction.options.getChannel('target_channel', true);
     const frequency = interaction.options.getString('frequency', true);
-    const timeChoice = interaction.options.getString('time', false) ?? new Date().getTime;
+    const timeChoice = interaction.options.getString('time', false) ?? "00:00";
+    // const timeChoice = interaction.options.getString('time', false) ?? new Date().getTime;
     const actions = interaction.options.getString('actions', true);
 
     try {
