@@ -24,7 +24,8 @@ const client = new Client({
 const commandsPath = path.join(__dirname, 'commands');
 
 const commandFiles = fs.readdirSync(commandsPath).filter(file => {
-    const isTargetFile = file.endsWith('.js') || file.endsWith('.ts');
+    const isTargetFile = (file.endsWith('.js') || file.endsWith('.ts')) 
+        && !(file.includes('schedule-list') || file.includes('schedule-remove')) ;
     const isDeclarationFile = file.endsWith('.d.ts');
     return isTargetFile && !isDeclarationFile;
 });

@@ -13,6 +13,21 @@ export function startDiscordScheduler(client: Client) {
             c => c.isTextBased() && !c.isThread()
         ) as Collection<string, TextChannel>;
         
+        if (channels.size === 0) {
+            console.warn("⚠️ [TMY-Scheduler] client.channels.cache is empty! Executing active guild channel sync...");
+            try {
+                for (const [_, guild] of client.guilds.cache) {
+                    await guild.channels.fetch();
+                }
+                channels = client.channels.cache.filter(
+                    c => c.isTextBased() && !c.isThread()
+                ) as Collection<string, TextChannel>;
+                console.log(`✅ [TMY-Scheduler] Sync complete. Populated tracking matrix with ${channels.size} channels.`);
+            } catch (fetchErr) {
+                console.error("❌ [TMY-Scheduler] Failed to force-fetch base channels:", fetchErr);
+            }
+        }
+
         let scheduleThread: ThreadChannel | null = null;
         for (const [_, ch] of channels) {
             try {
@@ -24,20 +39,26 @@ export function startDiscordScheduler(client: Client) {
 
                 if (found) {
                     scheduleThread = found as ThreadChannel;
+                    console.log(`📍 [TMY-Scheduler] Located active configuration control room thread in: #${ch.name}`);
                     break;
                 }
             } catch (e) {
+                console.error(`❌ [TMY-Scheduler] Failed evaluating sub-threads inside channel #${ch.name}:`, e);
                 continue;
             }
-
         }
 
-        if (!scheduleThread) return; 
+        if (!scheduleThread) {
+            console.log("❌ [TMY-Scheduler] Loop ended: Could not find an active 'tmy-schedules' thread in any readable context.");
+            return; 
+        }
 
         try {
+            console.log(`📥 [TMY-Scheduler] Fetching configurations from thread: #${scheduleThread.name}...`);
             const messages = await scheduleThread.messages.fetch({ limit: 20 });
 
             const configMessages = messages.filter(m => m.content.includes('⚙️ **TMY AUTOMATION CONFIGURATION**'));
+            console.log(`📝 [TMY-Scheduler] Discovered ${configMessages.size} configuration layouts to analyze.`);
 
             for (const [_, msg] of configMessages) {
                 const text = msg.content;
@@ -51,12 +72,16 @@ export function startDiscordScheduler(client: Client) {
                 const runMatch = text.match(/\[RUN:(\d+)\]/)?.[1];
                 const lastRun = runMatch ? parseInt(runMatch) : 0;
 
-                if (!srcId || !dstId || !freq) continue;
+                if (!srcId || !dstId || !freq) {
+                    console.warn(`⚠️ [TMY-Scheduler] Invalid arguments passed in config string. Skipping parsing for message ID: ${msg.id}`);
+                    continue; // Safely bypasses corrupted config entries without breaking the system
+                }
 
                 let shouldTrigger = false;
 
                 if (freq === 'hourly') {
-                    if (now - lastRun >= ONE_HOUR_MS) {
+                    const timeElapsed = now - lastRun;
+                    if (timeElapsed >= ONE_HOUR_MS) {
                         shouldTrigger = true;
                     }
                 } else if (freq === 'daily') {
@@ -64,7 +89,7 @@ export function startDiscordScheduler(client: Client) {
                     
                     const currentWorldDate = new Date(now);
                     const targetExecutionDate = new Date(now);
-                    targetExecutionDate.setUTCHours(targetHour ?? 0, targetMinute, 0, 0);
+                    targetExecutionDate.setUTCHours(targetHour ?? 0, targetMinute ?? 0, 0, 0);
                     
                     const lastRunDate = new Date(lastRun);
 
@@ -85,12 +110,14 @@ export function startDiscordScheduler(client: Client) {
                             
                             const randomLink = await getRandomTrackFromThread(playlistThread);
                             if (!randomLink) {
+                                console.warn(`⚠️ [TMY-Scheduler] Could not extract a valid playlist link string from thread: ${playlistThread.name}`);
                                 continue;
                             }
-                            const randomTrack = await getRandomTrackFromPlaylist(randomLink);
+                            const randomTrack = await getRandomTrackFromPlaylist(randomLink!);
 
                             if (!randomTrack) {
                                 await targetChannel.send(`⚠️ Scheduled event triggered, but I couldn't find any tracks inside the **#${playlistThread.name}** thread.`);
+                                continue;
                             } else {
                                 let outputMessage = "";
 
@@ -115,6 +142,7 @@ export function startDiscordScheduler(client: Client) {
                         }
                     } catch (fetchError) {
                         console.error("Could not reach destination channel or thread for schedule:", fetchError);
+                        continue;
                     }
 
                     // Update Discord's "Database" entry message with the new run timestamp
@@ -124,8 +152,13 @@ export function startDiscordScheduler(client: Client) {
                     } else {
                         updatedText = text + `\n[RUN:${now}]`;
                     }
+
+                    updatedText = updatedText.replace(/\*Last updated: .*\*$/, `*Last updated: <t:${Math.floor(now / 1000)}:R>*`);
                     
                     await msg.edit(updatedText);
+                    console.log(`✅ [TMY-Scheduler] Database config synced and updated to: [RUN:${now}]`);
+                } else {
+                    console.log(`⏳ [TMY-Scheduler] Timing metrics not crossed yet for config block: "${text.substring(0, 45)}..."`);
                 }
             }
         } catch (error) {
