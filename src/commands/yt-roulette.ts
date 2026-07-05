@@ -28,6 +28,33 @@ function extractPlaylistId(input: string): string {
     return input.trim();
 }
 
+export async function ytRoulette(playlistLink : string): Promise<EmbedBuilder | undefined> {
+
+    const playlistId = extractPlaylistId(playlistLink);
+
+    try {
+        const track = await getRandomTrackFromPlaylist(playlistId);
+
+        if (!track) {
+            return undefined;
+        }
+
+        const embed = new EmbedBuilder()
+            .setColor('#FF0000') // Classic YouTube Red
+            .setTitle('🎰 YouTube Roulette Result!')
+            .setDescription(`**[${track.title}](${track.videoUrl})**`)
+            .addFields({ name: 'Playlist ID', value: `\`${playlistId}\``, inline: true })
+            .setURL(track.videoUrl);
+
+        if (track.thumbnail) {
+            embed.setImage(track.thumbnail);
+        }
+        return embed;
+    } catch (e) {
+        return undefined;
+    }
+}
+
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
 
     await interaction.deferReply();

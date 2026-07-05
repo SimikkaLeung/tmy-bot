@@ -1,5 +1,6 @@
 import { Client, Collection, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
 import { getRandomTrackFromThread } from './trackPicker.js';
+import { ytRoulette } from '../commands/yt-roulette.js';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
@@ -88,8 +89,19 @@ export function startDiscordScheduler(client: Client) {
                                 let outputMessage = "";
 
                                 if (actionStr === 'yt-roulette') {
+                                    const embed = await ytRoulette(randomTrack);
                                     outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${randomTrack}`;
-                                    await targetChannel.send(outputMessage);
+                                    if (embed) {
+                                        await targetChannel.send({
+                                            content: outputMessage,
+                                            embeds: [embed]
+                                        });
+                                    }
+
+                                    // await interaction.editReply({
+                                    //     content: `🎵 **Here is your random pick!** \n${track.videoUrl}`,
+                                    //     embeds: [embed]
+                                    // });
                                 } 
                                 
                                 // else if (actionStr === 'lyric') {
