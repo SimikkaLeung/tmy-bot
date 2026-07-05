@@ -1,6 +1,7 @@
 import { Client, Collection, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
 import { getRandomTrackFromThread } from './trackPicker.js';
 import { getRandomTrackFromPlaylist } from './youtube.js';
+import { extractPlaylistId } from '../commands/yt-roulette.js';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
@@ -113,6 +114,7 @@ export function startDiscordScheduler(client: Client) {
                                 console.warn(`⚠️ [TMY-Scheduler] Could not extract a valid playlist link string from thread: ${playlistThread.name}`);
                                 continue;
                             }
+                            const playlistId = extractPlaylistId(randomLink);
                             const randomTrack = await getRandomTrackFromPlaylist(randomLink!);
 
                             if (!randomTrack) {

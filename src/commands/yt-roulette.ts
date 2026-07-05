@@ -13,7 +13,7 @@ export const data = new SlashCommandBuilder()
 /**
  * Helper function to extract a clean YouTube Playlist ID from user input
  */
-function extractPlaylistId(input: string): string {
+export function extractPlaylistId(input: string): string {
     // If it looks like a full URL, parse out the 'list=' parameter
     if (input.includes('list=')) {
         try {
