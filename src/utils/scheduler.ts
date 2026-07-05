@@ -1,11 +1,10 @@
-import { Client, Collection, EmbedBuilder, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
+import { Client, Collection, GatewayIntentBits, TextChannel, ThreadChannel, type AnyThreadChannel } from 'discord.js';
 import { getRandomTrackFromThread } from './trackPicker.js';
-import { ytRoulette } from '../commands/yt-roulette.js';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
 export function startDiscordScheduler(client: Client) {
-    console.log(`startDiscordScheduler`)
+
     setInterval(async () => {
         const now = Date.now();
 
@@ -75,39 +74,22 @@ export function startDiscordScheduler(client: Client) {
 
                 if (shouldTrigger) {
                     try {
-                        console.log(`targetChannel: ${dstId} , playlistThread: ${srcId}`);
                         const targetChannel = await client.channels.fetch(dstId) as TextChannel;
                         const playlistThread = await client.channels.fetch(srcId) as ThreadChannel;
 
                         if (targetChannel && playlistThread) {
                             console.log(`⏱️ Auto-triggering automation for thread: ${playlistThread.name}`);
-                            console.log("playlistThread.id: " + playlistThread.id)
+                            
                             const randomTrack = await getRandomTrackFromThread(playlistThread);
-                            console.log("randomTrack: " + randomTrack)
+
                             if (!randomTrack) {
                                 await targetChannel.send(`⚠️ Scheduled event triggered, but I couldn't find any tracks inside the **#${playlistThread.name}** thread.`);
                             } else {
                                 let outputMessage = "";
+
                                 if (actionStr === 'yt-roulette') {
                                     outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${randomTrack}`;
-                                    console.log("outputMessage1: " + outputMessage)
-                                    // const embed = await ytRoulette(randomTrack);
-                                    // outputMessage = `🎲 **Scheduled YT Roulette Drop!**\n${embed?.data.url}`;
-                                    // console.log("outputMessage2: " + outputMessage)
-                                    // if (embed instanceof EmbedBuilder) {
-                                    //     await targetChannel.send({
-                                    //         content: outputMessage,
-                                    //         embeds: [embed]
-                                    //     });
-                                    // } else {
-                                    //     await targetChannel.send({
-                                    //         content: `Failed to play a track.`
-                                    //     });
-                                    // }
-
-                                        await targetChannel.send({
-                                            content: outputMessage
-                                        });
+                                    await targetChannel.send(outputMessage);
                                 } 
                                 
                                 // else if (actionStr === 'lyric') {
