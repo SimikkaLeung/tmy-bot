@@ -9,12 +9,13 @@ import {
 export const data = new SlashCommandBuilder()
     .setName('schedule-setup')
     .setDescription('Configure automatic scheduling for track tracking')
-    .addChannelOption(option =>
-        option.setName('playlist_thread')
-            .setDescription('The Discord thread containing your track list')
-            .addChannelTypes(ChannelType.PublicThread, ChannelType.PrivateThread)
-            .setRequired(true)
-    )
+    // .addChannelOption(option =>
+    //     option.setName('playlist_thread')
+    //         .setDescription('The Discord thread containing your track list')
+    //         .addChannelTypes(ChannelType.PublicThread, ChannelType.PrivateThread)
+    //         .setRequired(true)
+    // )
+    .addStringOption(o => o.setName('playlist_thread').setDescription('The Discord thread containing your track list').setRequired(true))
     .addChannelOption(option =>
         option.setName('target_channel')
             .setDescription('The text channel where the bot will automatically post')
@@ -56,18 +57,15 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
 
-    const palylistChannelData = interaction.options.getChannel('playlist_thread', true);
-    const playlistThread = interaction.client?.channels?.cache.get(palylistChannelData.id) as ThreadChannel;
-    if (!playlistThread || (playlistThread.type !== ChannelType.PublicThread && playlistThread.type !== ChannelType.PrivateThread)) {
-        return interaction.reply({ content: "❌ Please select a valid active thread channel!", ephemeral: true });
-    }
+    const channel = interaction.channel as TextChannel;
+    const threadManager = await channel.threads.fetch();
+    const playlistThread = threadManager.threads.find(t => t.name.toLowerCase() === interaction.options.getString('playlist_thread', true));
+
     // const playlistThread = interaction.options.getChannel('playlist_thread', true) as ThreadChannel;
     const targetChannel = interaction.options.getChannel('target_channel', true);
     const frequency = interaction.options.getString('frequency', true);
     const timeChoice = interaction.options.getString('time', true) ?? new Date().getTime;
     const actions = interaction.options.getString('actions', true);
-
-
 
     try {
         const parentChannel = interaction.channel as TextChannel;
@@ -87,7 +85,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             `⚙️ **TMY AUTOMATION CONFIGURATION**`,
             `Do not edit the brackets below manually.`,
             `───`,
-            `🧵 **Source Thread:** ${playlistThread} \`[SRC:${playlistThread.id}]\``,
+            `🧵 **Source Thread:** ${playlistThread} \`[SRC:${playlistThread?.id}]\``,
             `📢 **Post Destination:** ${targetChannel} \`[DST:${targetChannel.id}]\``,
             `📅 **Frequency:** \`${frequency}\` \`[FREQ:${frequency}]\``,
             `⏰ **Scheduled Time:** \`${timeChoice}\` \`[TIME:${timeChoice}]\``,
