@@ -99,6 +99,24 @@ export function startDiscordScheduler(client: Client) {
                     if (currentWorldDate >= targetExecutionDate && lastRunDate < targetExecutionDate) {
                         shouldTrigger = true;
                     }
+                } else if (freq === 'weekly') {
+                    const [targetHour, targetMinute] = timeStr.split(':').map(Number);
+                    
+                    const currentWorldDate = new Date(now);
+
+                    const lastRunDate = new Date(lastRun);
+
+                    const targetExecutionDate = new Date(now);
+
+                    if (targetExecutionDate.getDate() - lastRunDate.getDate() >= 7) {
+                        targetExecutionDate.setUTCHours(targetHour ?? 0, targetMinute ?? 0, 0, 0);
+                    } else {
+                        continue;
+                    }
+
+                    if (currentWorldDate >= targetExecutionDate && lastRunDate < targetExecutionDate) {
+                        shouldTrigger = true;
+                    }
                 }
 
                 if (shouldTrigger) {

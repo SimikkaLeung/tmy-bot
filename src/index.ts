@@ -1,4 +1,4 @@
-import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js';
 // import * as dotenv from 'dotenv';
 import * as fs from 'node:fs';
 import { createServer } from 'node:http';
@@ -103,3 +103,20 @@ client.on('warn', (warning) => {
 
 server.on('error', (err) => console.error('Server error:', err.message));
 
+const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
+
+async function syncCommands(clientId: string, activeCommandsArray: any[]) {
+    try {
+        console.log('🔄 Started refreshing application (/) commands on Discord...');
+
+        // This overwrites Discord's current list with ONLY your loaded, non-hidden commands
+        await rest.put(
+            Routes.applicationCommands(clientId),
+            { body: activeCommandsArray },
+        );
+
+        console.log('✅ Successfully re-registered active commands. Hidden commands are now removed!');
+    } catch (error) {
+        console.error('❌ Failed to sync commands with Discord:', error);
+    }
+}
